@@ -18,11 +18,10 @@ connection.connect(function (err) {
 });
 
 function displayItems() {
-    connection.query("Select * FROM products", function (err, res) {
+    connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         // Log all results from products table
         console.log(res);
-        connection.end();
     });
 }
 
@@ -36,9 +35,31 @@ function purchase() {
         {
             name: "quantity",
             type: "number",
+            
             message: "How many units do you wish to purchase?"
         }
-    ]).then(function (answer) {
-        console.log("Insufficient quantity!");
+    ]).then(function(answer) {
+        var id = answer.id;
+        var num = answer.quantity;
+        connection.query("SELECT * FROM products WHERE item_id =  " + id, function(err, res) {
+            if (err) {
+                console.log(err);
+            }
+
+            if (num <= res[0].stock_quantity) {
+                console.log("Available!");
+ 
+                var total = num * res[0].price;
+                console.log("Your total price is: " + total);
+            
+                var stock = res[0].stock_quantity - num;
+                connection.query("UPDATE products SET stock_quantity = " + stock + "WHERE item_id = " + id);
+                // console.log(res);
+                connection.end();
+            } else {
+                console.log("Insufficient quantity!");
+                connection.end();
+            }
+        });
     });
 }
