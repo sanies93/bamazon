@@ -50,11 +50,13 @@ function purchase() {
                 console.log("Available!");
  
                 var total = num * res[0].price;
-                console.log("Your total price is: " + total);
+                console.log("Your total price is: $" + total);
             
-                var stock = res[0].stock_quantity - num;
-                connection.query("UPDATE products SET stock_quantity = " + stock + "WHERE item_id = " + id);
-                // console.log(res);
+                var stock = res[0].stock_quantity - num; 
+                var query = "UPDATE products SET stock_quantity = ? WHERE item_id = ?";
+                connection.query(query, [stock, id]);
+                
+                displayItems();
                 connection.end();
             } else {
                 console.log("Insufficient quantity!");
